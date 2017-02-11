@@ -25,6 +25,12 @@ class Board(list):
     def b_side(self):
         return self[self.SLOT_B:self.SLOT_B + self.SLOTS_PER_SIDE]
 
+    def winning_player(self):
+        return self.PLAYER_B if self.b_score > self.a_score else self.PLAYER_A
+
+    def score_of(self, player):
+        return getattr(self, '{}_score'.format(player.lower()))
+
     @property
     def a_score(self):
         return self[self.SLOT_B - 1]
@@ -64,28 +70,37 @@ class Board(list):
     def opposite_player(self, player):
         return self.PLAYER_A if player == self.PLAYER_B else self.PLAYER_B
 
-    def make_move(self, player, offset):
-        i = self.retrieve_slot_for(player) + offset
-        cnt = self[i]
-        print('{} picked up all {} pieces from {} and moved them accordingly'.format(player, cnt, offset))
+    def make_move(self, move):
+        i = move.slot
+        cnt = move.cnt
+        print('{} picked up all {} pieces from {} and moved them accordingly'
+              .format(move.player, cnt, move.offset))
         self[i] = 0
         while cnt > 0:
             i = (i + 1) % len(self)
 
-            if i + 1 == self.retrieve_slot_for(player):
+            if i + 1 == self.retrieve_slot_for(move.player):
                 continue
 
-            # log('Incrementing {}'.format(i))
             self[i] += 1
             cnt -= 1
+
+        offset = i - self.retrieve_slot_for(move.player) + 1
+        if offset in range(6) and self[i] == 1:
+            i = (6 - offset) + self.retrieve_slot_for(self.opposite_player(move.player))
+            self.increment_pot(self.opposite_player(move.player), self[i])
+            print('Landed on an empty slot on our side, picked up all {} pieces from {} and moved them to my pot'
+                  .format(self[i], offset))
+            self[i] = 0
 
     def retrieve_slot_for(self, player):
         return getattr(self, 'SLOT_{}'.format(player))
 
     def is_game_over(self):
-        if sum(self.a_side()) == 0:
-            return self.PLAYER_A
-        if sum(self.b_side()) == 0:
-            return self.PLAYER_B
+        if sum(self.a_side()) == 0 or sum(self.b_side()) == 0:
+            return True
         else:
-            return None
+            return False
+
+    def increment_pot(self, player, amt):
+        self[self.retrieve_slot_for(player) - 1] += amt
