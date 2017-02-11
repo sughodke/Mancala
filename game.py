@@ -1,20 +1,14 @@
 import random
 
+from autoplayer import RandomAP
 from board import Board
-from move import Move
 
 b = Board()
 
 # game loop
 player = [b.PLAYER_A, b.PLAYER_B][random.randint(0, 1)]
 while not b.is_game_over():
-    while True:
-        try:
-            m = Move(player, random.randint(0, 5), b)
-            break
-        except Exception:
-            pass
-
+    m = RandomAP.pick_move(player, b)
     b.make_move(m)
 
     if not m.bonus_turn:

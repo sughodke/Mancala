@@ -20,10 +20,10 @@ class Move:
 
     def compute_props(self):
         """Interestingly this function can sit here or in Board"""
-        self.slot = self.board.retrieve_slot_for(player) + self.offset
+        self.slot = self.board.retrieve_slot_for(self.player) + self.offset
         self.cnt = self.board[self.slot]
 
-        if self.slot == self.board.retrieve_slot_for(self.board.opposite_player(player)):
+        if self.slot == self.board.retrieve_slot_for(self.board.opposite_player(self.player)):
             self.bonus_turn = True
 
     def __str__(self):
