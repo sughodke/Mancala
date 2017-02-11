@@ -1,6 +1,6 @@
 import random
 
-from autoplayer import RandomAP
+from autoplayer import AdversarialAP
 from board import Board
 
 b = Board()
@@ -8,7 +8,7 @@ b = Board()
 # game loop
 player = [b.PLAYER_A, b.PLAYER_B][random.randint(0, 1)]
 while not b.is_game_over():
-    m = RandomAP.pick_move(player, b)
+    m = AdversarialAP.pick_move(player, b)
     b.make_move(m)
 
     if not m.bonus_turn:
